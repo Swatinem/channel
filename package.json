@@ -27,7 +27,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "tap test/*.js"
+    "test": "node --harmony test/test.js"
   },
   "testling": {
     "files": "test/*.js",
@@ -43,12 +43,8 @@
     ]
   },
   "dependencies": {
-    "es6-promise": "~0.1.1"
   },
   "devDependencies": {
-    "tape": "~2.3.2",
-    "tap": "~0.4.8",
-    "stringencoding": "~0.0.0",
-    "gnode": "~0.0.7"
+    "tape": "3"
   }
 }

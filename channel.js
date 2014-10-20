@@ -1,6 +1,5 @@
 "use strict";
 
-var Promise = require('es6-promise').Promise
 var FixedBuffer = require("./buffer").FixedBuffer
 
 // Private symbols are no yet present in the language but
@@ -15,7 +14,6 @@ var $out = "@@channel/out"
 var $select = "@@channel/select"
 var $value = "@@operation/value"
 var $resolve = "@@operation/resolve"
-var $init = "@@operation/init"
 var $result = "@@operation/result"
 var $isActive = "@@operation/active?"
 var $complete = "@@operation/complete"
@@ -36,8 +34,18 @@ var MAX_QUEUE_SIZE = Infinity // 1024
 // it's race to truthy, which mainly used to share `race`
 // when racing multiple tasks where only one should be complete.
 function Operation(select) {
-  this[$select] = select || this
-  Promise.call(this, this[$init].bind(this))
+  var resolvefn
+  var promise = new Promise(function (resolve) {
+    resolvefn = resolve
+  })
+  promise[$resolve] = resolvefn
+  promise[$select] = select || promise
+
+  Object.keys(Operation.prototype).forEach(function (key) {
+    promise[key] = Operation.prototype[key]
+  })
+
+  return promise
 }
 Operation.prototype = Object.create(Promise.prototype)
 Operation.prototype.constructor = Operation
@@ -49,9 +57,6 @@ Operation.prototype.valueOf = function() {
     throw new Error("Can not dereference result of pending operation")
 
   return this[$result]
-}
-Operation.prototype[$init] = function(resolve, _) {
-  this[$resolve] = resolve
 }
 // If operation is pending method returns `false`, which is the case
 // unless associated selecet has a choice set to this.

@@ -6,7 +6,6 @@ var Port = require("../index").Port
 var InputPort = require("../index").InputPort
 var OutputPort = require("../index").OutputPort
 var Select = require("../index").Select
-var Promise = require("es6-promise").Promise
 var FixedBuffer = require("../index").FixedBuffer
 
 

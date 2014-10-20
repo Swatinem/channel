@@ -1,7 +1,6 @@
 "use strict";
 
 var tape = require("tape")
-var Promise = require("es6-promise").Promise
 
 function assertOperation(isPending, value, test, operation) {
   test.equal(operation.isPending(), isPending,
@@ -35,8 +34,10 @@ function withAsserts(source) {
     asserts.push(assertOperation(false, value, this, operation))
   }
   test.end = function() {
+    // XXX: wtf?
+    source.end()
     Promise.all(asserts).then(function() {
-      source.end()
+      //source.end()
     })
   }
 
@@ -49,3 +50,7 @@ function test(description, unit) {
   })
 }
 module.exports = test
+
+require('./api')
+require('./bufferring')
+require('./closed')
