@@ -51,10 +51,10 @@ Operation.prototype.valueOf = function() {
   return this[$result]
 }
 Operation.prototype.then = function() {
-  this[$promise].then.apply(this[$promise], arguments);
+  return this[$promise].then.apply(this[$promise], arguments);
 }
 Operation.prototype.catch = function() {
-  this[$promise].catch.apply(this[$promise], arguments);
+  return this[$promise].catch.apply(this[$promise], arguments);
 }
 
 Operation.prototype[$init] = function(resolve, _) {
