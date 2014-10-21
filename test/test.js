@@ -34,10 +34,8 @@ function withAsserts(source) {
     asserts.push(assertOperation(false, value, this, operation))
   }
   test.end = function() {
-    // XXX: wtf?
-    source.end()
     Promise.all(asserts).then(function() {
-      //source.end()
+      source.end()
     })
   }
 

@@ -14,6 +14,8 @@ var $out = "@@channel/out"
 var $select = "@@channel/select"
 var $value = "@@operation/value"
 var $resolve = "@@operation/resolve"
+var $init = "@@operation/init"
+var $promise = "@@operation/promise"
 var $result = "@@operation/result"
 var $isActive = "@@operation/active?"
 var $complete = "@@operation/complete"
@@ -34,18 +36,8 @@ var MAX_QUEUE_SIZE = Infinity // 1024
 // it's race to truthy, which mainly used to share `race`
 // when racing multiple tasks where only one should be complete.
 function Operation(select) {
-  var resolvefn
-  var promise = new Promise(function (resolve) {
-    resolvefn = resolve
-  })
-  promise[$resolve] = resolvefn
-  promise[$select] = select || promise
-
-  Object.keys(Operation.prototype).forEach(function (key) {
-    promise[key] = Operation.prototype[key]
-  })
-
-  return promise
+  this[$select] = select || this;
+  this[$promise] = new Promise(this[$init].bind(this));
 }
 Operation.prototype = Object.create(Promise.prototype)
 Operation.prototype.constructor = Operation
@@ -57,6 +49,16 @@ Operation.prototype.valueOf = function() {
     throw new Error("Can not dereference result of pending operation")
 
   return this[$result]
+}
+Operation.prototype.then = function() {
+  this[$promise].then.apply(this[$promise], arguments);
+}
+Operation.prototype.catch = function() {
+  this[$promise].catch.apply(this[$promise], arguments);
+}
+
+Operation.prototype[$init] = function(resolve, _) {
+  this[$resolve] = resolve
 }
 // If operation is pending method returns `false`, which is the case
 // unless associated selecet has a choice set to this.
